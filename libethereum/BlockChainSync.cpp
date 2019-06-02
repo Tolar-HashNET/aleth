@@ -238,6 +238,11 @@ void BlockChainSync::syncPeer(NodeID const& _peerID, bool _force)
 
     if (isSyncPaused())
     {
+        if (!host().bq().knownFull())
+        {
+            LOG(m_loggerDetail) << "Detected paused sync while bq isn't full. BQ status: " << host().bq().status();
+            assert(false);
+        }
         LOG(m_loggerDetail) << "Can't sync with peer " << _peerID
                             << " - sync state is paused. Block queue status: "
                             << host().bq().status();
