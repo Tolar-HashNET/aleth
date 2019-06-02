@@ -104,8 +104,8 @@ evmc::bytes32 EvmCHost::get_code_hash(evmc::address const& _addr) noexcept
     return toEvmC(m_extVM.codeHashAt(fromEvmC(_addr)));
 }
 
-size_t EvmCHost::copy_code(
-    evmc::address const& _addr, size_t _codeOffset, byte* _bufferData, size_t _bufferSize) noexcept
+size_t copyCode(evmc_context* _context, evmc_address const* _addr, size_t _codeOffset,
+    CryptoPP::byte* _bufferData, size_t _bufferSize) noexcept
 {
     Address addr = fromEvmC(_addr);
     bytes const& c = m_extVM.codeAt(addr);

@@ -35,48 +35,44 @@ TransactionBase::TransactionBase(bytesConstRef _rlpData, CheckTransaction _check
         if (!rlp.isList())
             BOOST_THROW_EXCEPTION(InvalidTransactionFormat() << errinfo_comment("transaction RLP must be a list"));
 
-        m_nonce = rlp[0].toInt<u256>();
-        m_gasPrice = rlp[1].toInt<u256>();
-        m_gas = rlp[2].toInt<u256>();
-        if (!rlp[3].isData())
-            BOOST_THROW_EXCEPTION(InvalidTransactionFormat()
-                                  << errinfo_comment("recepient RLP must be a byte array"));
-        m_type = rlp[3].isEmpty() ? ContractCreation : MessageCall;
-        m_receiveAddress = rlp[3].isEmpty() ? Address() : rlp[3].toHash<Address>(RLP::VeryStrict);
-        m_value = rlp[4].toInt<u256>();
+		m_nonce = rlp[0].toInt<u256>();
+		m_gasPrice = rlp[1].toInt<u256>();
+		m_gas = rlp[2].toInt<u256>();
+		m_type = rlp[3].isEmpty() ? ContractCreation : MessageCall;
+		m_receiveAddress = rlp[3].isEmpty() ? Address() : rlp[3].toHash<Address>(RLP::VeryStrict);
+		m_value = rlp[4].toInt<u256>();
 
-        if (!rlp[5].isData())
-            BOOST_THROW_EXCEPTION(InvalidTransactionFormat()
-                                  << errinfo_comment("transaction data RLP must be a byte array"));
+		if (!rlp[5].isData())
+			BOOST_THROW_EXCEPTION(InvalidTransactionFormat() << errinfo_comment("transaction data RLP must be an array"));
 
-        m_data = rlp[5].toBytes();
+		m_data = rlp[5].toBytes();
 
-        int const v = rlp[6].toInt<int>();
-        h256 const r = rlp[7].toInt<u256>();
-        h256 const s = rlp[8].toInt<u256>();
+		int const v = rlp[6].toInt<int>();
+		h256 const r = rlp[7].toInt<u256>();
+		h256 const s = rlp[8].toInt<u256>();
 
-        if (isZeroSignature(r, s))
-        {
-            m_chainId = v;
-            m_vrs = SignatureStruct{r, s, 0};
-        }
-        else
-        {
-            if (v > 36)
-                m_chainId = (v - 35) / 2; 
-            else if (v == 27 || v == 28)
-                m_chainId = -4;
-            else
-                BOOST_THROW_EXCEPTION(InvalidSignature());
+		if (isZeroSignature(r, s))
+		{
+			m_chainId = v;
+			m_vrs = SignatureStruct{r, s, 0};
+		}
+		else
+		{
+			if (v > 36)
+				m_chainId = (v - 35) / 2; 
+			else if (v == 27 || v == 28)
+				m_chainId = -4;
+			else
+				BOOST_THROW_EXCEPTION(InvalidSignature());
 
             m_vrs = SignatureStruct{r, s, static_cast<byte>(v - (m_chainId * 2 + 35))};
 
-            if (_checkSig >= CheckTransaction::Cheap && !m_vrs->isValid())
-                BOOST_THROW_EXCEPTION(InvalidSignature());
-        }
+			if (_checkSig >= CheckTransaction::Cheap && !m_vrs->isValid())
+				BOOST_THROW_EXCEPTION(InvalidSignature());
+		}
 
-        if (_checkSig == CheckTransaction::Everything)
-            m_sender = sender();
+		if (_checkSig == CheckTransaction::Everything)
+			m_sender = sender();
 
         if (rlp.itemCount() > 9)
             BOOST_THROW_EXCEPTION(InvalidTransactionFormat() << errinfo_comment("too many fields in the transaction RLP"));
