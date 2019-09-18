@@ -79,7 +79,11 @@ bool KeyManager::load(string const& _pass)
 		bytes encKeys = contents(m_keysFile);
 		if (encKeys.empty())
 			return false;
+#ifdef TOLAR_TEST
+    m_keysFileKey = SecureFixedHash<16>(pbkdf2(_pass, salt, 1, 16));
+#else
 		m_keysFileKey = SecureFixedHash<16>(pbkdf2(_pass, salt, 262144, 16));
+#endif
 		bytesSec bs = decryptSymNoAuth(m_keysFileKey, h128(), &encKeys);
 		RLP s(bs.ref());
 		unsigned version = unsigned(s[0]);
@@ -320,7 +324,11 @@ string const& KeyManager::passwordHint(Address const& _address) const
 h256 KeyManager::hashPassword(string const& _pass) const
 {
 	// TODO SECURITY: store this a bit more securely; Scrypt perhaps?
+#ifdef TOLAR_TEST
+  return h256(pbkdf2(_pass, asBytes(m_defaultPasswordDeprecated), 1, 32).makeInsecure());
+#else
 	return h256(pbkdf2(_pass, asBytes(m_defaultPasswordDeprecated), 262144, 32).makeInsecure());
+#endif
 }
 
 void KeyManager::cachePassword(string const& _password) const
@@ -340,7 +348,11 @@ void KeyManager::write(string const& _pass, fs::path const& _keysFile) const
 {
 	bytes salt = h256::random().asBytes();
 	writeFile(appendToFilename(_keysFile, ".salt"), salt, true);
+#ifdef TOLAR_TEST
+  auto key = SecureFixedHash<16>(pbkdf2(_pass, salt, 1, 16));
+#else
 	auto key = SecureFixedHash<16>(pbkdf2(_pass, salt, 262144, 16));
+#endif
 
 	cachePassword(_pass);
 	m_master = hashPassword(_pass);
@@ -373,6 +385,7 @@ void KeyManager::write(SecureFixedHash<16> const& _key, fs::path const& _keysFil
 KeyPair KeyManager::newKeyPair(KeyManager::NewKeyType _type)
 {
 	KeyPair p = KeyPair::create();
+#ifndef TOLAR_TEST
 	bool keepGoing = true;
 	unsigned done = 0;
 	auto f = [&]() {
@@ -408,5 +421,7 @@ KeyPair KeyManager::newKeyPair(KeyManager::NewKeyType _type)
 		t->join();
 		delete t;
 	}
+#endif
+
 	return p;
 }
