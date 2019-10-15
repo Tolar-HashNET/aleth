@@ -17,6 +17,8 @@
 
 #pragma once
 
+#undef MSIZE
+
 #include <cstdint>
 
 namespace dev
