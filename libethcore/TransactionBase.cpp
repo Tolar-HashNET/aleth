@@ -74,7 +74,7 @@ TransactionBase::TransactionBase(bytesConstRef _rlpData, CheckTransaction _check
                 BOOST_THROW_EXCEPTION(InvalidSignature());
 
             auto const recoveryID =
-                m_chainId.has_value() ? CryptoPP::byte{v - (u256{*m_chainId} * 2 + 35)} : byte{v - 27};
+                m_chainId.has_value() ? CryptoPP::byte{v - (u256{*m_chainId} * 2 + 35)} : CryptoPP::byte{v - 27};
             m_vrs = SignatureStruct{r, s, recoveryID};
 
             if (_checkSig >= CheckTransaction::Cheap && !m_vrs->isValid())

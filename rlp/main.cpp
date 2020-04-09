@@ -259,7 +259,7 @@ int main(int argc, char** argv)
     bytes in;
     if (inputFile == "--")
         for (int i = cin.get(); i != -1; i = cin.get())
-            in.push_back((byte)i);
+            in.push_back((CryptoPP::byte)i);
     else
     {
         try
@@ -470,7 +470,7 @@ int main(int argc, char** argv)
                                     ss.push_back(fromHex(s.substr(i, 2))[0]);
                             }
                             else if (s[i] != '\\')
-                                ss.push_back((byte)s[i]);
+                                ss.push_back((CryptoPP::byte)s[i]);
                         out << ss;
                     }
                     break;

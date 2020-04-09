@@ -133,10 +133,10 @@ if (TOOLS)
     add_subdirectory(aleth-bootnode)
 endif()
 
-if (TESTS)
-    enable_testing()
-    add_subdirectory(test)
-endif()
+#if (TESTS)
+#    enable_testing()
+#    add_subdirectory(test)
+#endif()
 
 
 install(FILES ${PROJECT_BINARY_DIR}/aleth/buildinfo.json DESTINATION ${CMAKE_INSTALL_DATADIR}/aleth)

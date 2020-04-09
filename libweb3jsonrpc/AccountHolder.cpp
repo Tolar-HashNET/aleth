@@ -44,7 +44,7 @@ int AccountHolder::addProxyAccount(const Address& _account)
 {
     Guard g(x_rngMutex);
     int id = std::uniform_int_distribution<int>(1)(g_randomGenerator);
-    id = int(u256(FixedHash<32>(sha3(bytesConstRef((byte*)(&id), sizeof(int) / sizeof(byte))))));
+    id = int(u256(FixedHash<32>(sha3(bytesConstRef((CryptoPP::byte*)(&id), sizeof(int) / sizeof(CryptoPP::byte))))));
     if (isProxyAccount(_account) || id == 0 || m_transactionQueues.count(id))
         return 0;
     m_proxyAccounts.insert(make_pair(_account, id));

@@ -52,13 +52,26 @@ string dev::toBase64(bytesConstRef _in)
 	return encoded;
 }
 
+string dev::toBase64URLSafe(bytesConstRef _in)
+{
+  string encoded;
+
+  CryptoPP::ArraySource ss(&_in[0], sizeof(_in), true,
+                           new CryptoPP::Base64URLEncoder(
+                               new CryptoPP::StringSink(encoded)
+                           ) // Base64Encoder
+  ); // StringSource
+  return encoded;
+}
+
+
 bytes dev::fromBase64(string const& encoded_string)
 {
 	bytes values(encoded_string.size() + 1);
 	//TODO(mhala) put bytes sink intead ArraySink
 	CryptoPP::StringSource ss(encoded_string, true,
 			    new CryptoPP::Base64Decoder(
-				            new CryptoPP::ArraySink(&values[0], sizeof(values))
+				            new CryptoPP::ArraySink(&values[0], values.size())
 					        ) // Base64Decoder
 		       ); // StringSource
 
@@ -68,3 +81,4 @@ bytes dev::fromBase64(string const& encoded_string)
 	return values;
 
 }
+

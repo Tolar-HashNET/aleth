@@ -299,7 +299,7 @@ int main(int argc, char** argv)
     executive.setResultRecipient(res);
     t.forceSender(sender);
 
-    unordered_map<byte, pair<unsigned, bigint>> counts;
+    unordered_map<CryptoPP::byte, pair<unsigned, bigint>> counts;
     unsigned total = 0;
     bigint memTotal;
 
@@ -314,7 +314,7 @@ int main(int argc, char** argv)
     {
         onOp = [&](uint64_t, uint64_t, Instruction inst, bigint m, bigint gasCost, bigint,
                    VMFace const*, ExtVMFace const*) {
-            byte b = static_cast<byte>(inst);
+          CryptoPP::byte b = static_cast<CryptoPP::byte>(inst);
             counts[b].first++;
             counts[b].second += gasCost;
             total++;
@@ -353,7 +353,7 @@ int main(int argc, char** argv)
                  Instruction::CREATE, Instruction::CALLCODE, Instruction::DELEGATECALL,
                  Instruction::MSTORE8, Instruction::MSTORE, Instruction::MLOAD, Instruction::SHA3})
         {
-            auto const& count = counts[static_cast<byte>(inst)];
+            auto const& count = counts[static_cast<CryptoPP::byte>(inst)];
             if (count.first != 0)
                 cout << "  " << instructionInfo(inst).name << " x " << count.first << " ("
                      << count.second << " gas)\n";
